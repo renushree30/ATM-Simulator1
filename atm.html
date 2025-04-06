@@ -54,10 +54,66 @@
     }
 %>
 
+<%@ page import="java.io.*, java.util.*" %>
+<%
+    final int apin = 4321;
+    Float balance = (Float) session.getAttribute("balance");
+    if (balance == null) {
+        balance = 1000.0f; // Initial balance
+        session.setAttribute("balance", balance);
+    }
+
+    String result = "";
+
+    if (request.getMethod().equalsIgnoreCase("POST")) {
+        try {
+            int pin = Integer.parseInt(request.getParameter("pin"));
+            int choice = Integer.parseInt(request.getParameter("choice"));
+            String amountParam = request.getParameter("amount");
+            float amount = (amountParam == null || amountParam.isEmpty()) ? 0 : Float.parseFloat(amountParam);
+
+            if (pin == apin) {
+                switch (choice) {
+                    case 1:
+                        if (amount > 0) {
+                            balance += amount;
+                            result = "Deposit successful!";
+                        } else {
+                            result = "Invalid amount.";
+                        }
+                        break;
+                    case 2:
+                        if (amount > 0 && (balance - amount) >= 500) {
+                            balance -= amount;
+                            result = "Withdrawal successful!";
+                        } else {
+                            result = "Cannot withdraw this amount. Minimum balance of ₹500 required.";
+                        }
+                        break;
+                    case 3:
+                        result = "Your current balance is: ₹" + String.format("%.2f", balance);
+                        break;
+                    case 4:
+                        result = "Thank you for using the ATM. Session ended.";
+                        session.invalidate();
+                        break;
+                    default:
+                        result = "Invalid choice.";
+                }
+                session.setAttribute("balance", balance);
+            } else {
+                result = "Incorrect PIN. Access denied.";
+            }
+        } catch (Exception e) {
+            result = "Error: " + e.getMessage();
+        }
+    }
+%>
+
 <!DOCTYPE html>
 <html>
 <head>
-    <title>ATM Web Interface</title>
+    <title>ATM Machine</title>
 </head>
 <body>
     <h2>ATM Machine</h2>
