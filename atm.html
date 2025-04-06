@@ -1,55 +1,3 @@
-<%@ page import="java.util.*" %>
-<%
-    // Initialize balance (would typically be in a database or session)
-    Float balance = (Float) application.getAttribute("balance");
-    if (balance == null) {
-        balance = 1000.0f;
-        application.setAttribute("balance", balance);
-    }
-
-    String message = "";
-    String pinParam = request.getParameter("pin");
-    String action = request.getParameter("action");
-    String amountParam = request.getParameter("amount");
-
-    int correctPin = 4321;
-
-    if (pinParam != null) {
-        int pin = Integer.parseInt(pinParam);
-
-        if (pin == correctPin) {
-            float amount = 0;
-            if (amountParam != null && !amountParam.isEmpty()) {
-                amount = Float.parseFloat(amountParam);
-            }
-
-            if ("deposit".equals(action)) {
-                if (amount > 0) {
-                    balance += amount;
-                    message = "Deposit successful! New balance: " + balance;
-                } else {
-                    message = "Invalid deposit amount.";
-                }
-            } else if ("withdraw".equals(action)) {
-                if (amount > 0 && (balance - amount) >= 500) {
-                    balance -= amount;
-                    message = "Withdrawal successful! New balance: " + balance;
-                } else {
-                    message = "Cannot withdraw this amount. Maintain minimum balance of 500.";
-                }
-            } else if ("balance".equals(action)) {
-                message = "Your current balance is: " + balance;
-            } else {
-                message = "Invalid action selected.";
-            }
-
-            application.setAttribute("balance", balance);
-        } else {
-            message = "Incorrect PIN. Access denied.";
-        }
-    }
-%>
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -57,7 +5,7 @@
     <style>
         body {
             font-family: Arial;
-            background-color: #f4f4f4;
+            background-color: #f2f2f2;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -68,41 +16,73 @@
             padding: 30px;
             border-radius: 10px;
             box-shadow: 0 0 10px gray;
+            width: 300px;
         }
-        input, select {
+        input, select, button {
             width: 100%;
-            padding: 8px;
-            margin-top: 10px;
+            padding: 10px;
+            margin: 10px 0;
         }
         .result {
-            margin-top: 20px;
             font-weight: bold;
+            margin-top: 15px;
         }
     </style>
 </head>
 <body>
     <div class="atm-box">
         <h2>ATM Interface</h2>
-        <form method="post">
-            <label>Enter PIN:</label>
-            <input type="password" name="pin" required>
+        <label>Enter PIN:</label>
+        <input type="password" id="pinInput" />
 
-            <label>Select Action:</label>
-            <select name="action">
-                <option value="deposit">Deposit</option>
-                <option value="withdraw">Withdraw</option>
-                <option value="balance">Check Balance</option>
-            </select>
+        <label>Select Action:</label>
+        <select id="actionSelect">
+            <option value="deposit">Deposit</option>
+            <option value="withdraw">Withdraw</option>
+            <option value="balance">Check Balance</option>
+        </select>
 
-            <label>Amount (if applicable):</label>
-            <input type="number" name="amount" min="1">
+        <label>Amount (if applicable):</label>
+        <input type="number" id="amountInput" min="0" />
 
-            <input type="submit" value="Submit">
-        </form>
+        <button onclick="processATM()">Submit</button>
 
-        <div class="result">
-            <%= message %>
-        </div>
+        <div class="result" id="messageArea"></div>
     </div>
+
+    <script>
+        const correctPIN = 4321;
+        let balance = 1000;
+
+        function processATM() {
+            const pin = parseInt(document.getElementById("pinInput").value);
+            const action = document.getElementById("actionSelect").value;
+            const amount = parseFloat(document.getElementById("amountInput").value) || 0;
+            const messageArea = document.getElementById("messageArea");
+
+            if (pin !== correctPIN) {
+                messageArea.textContent = "Incorrect PIN. Access denied.";
+                return;
+            }
+
+            if (action === "deposit") {
+                if (amount > 0) {
+                    balance += amount;
+                    messageArea.textContent = Deposit successful! New balance: ₹${balance.toFixed(2)};
+                } else {
+                    messageArea.textContent = "Invalid deposit amount.";
+                }
+            } else if (action === "withdraw") {
+                if (amount > 0 && balance - amount >= 500) {
+                    balance -= amount;
+                    messageArea.textContent = Withdrawal successful! New balance: ₹${balance.toFixed(2)};
+                } else {
+                    messageArea.textContent = "Cannot withdraw. Minimum ₹500 balance must be maintained.";
+                }
+            } else if (action === "balance") {
+                messageArea.textContent = Your current balance is ₹${balance.toFixed(2)};
+            }
+        }
+    </script>
 </body>
 </html>
