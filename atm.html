@@ -40,7 +40,7 @@
                         break;
                     case 4:
                         result = "Thank you for using the ATM. Session ended.";
-                        session.invalidate(); // Clear session
+                        session.invalidate();
                         break;
                     default:
                         result = "Invalid choice.";
@@ -62,13 +62,13 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f2f2f2;
+            background: #f2f2f2;
             max-width: 500px;
             margin: 50px auto;
-            padding: 20px;
+            padding: 25px;
             border: 2px solid #ccc;
             border-radius: 10px;
-            background: #ffffff;
+            background-color: #ffffff;
         }
         h2 {
             text-align: center;
@@ -80,45 +80,51 @@
             font-size: 16px;
         }
         input[type="submit"] {
-            background-color: #28a745;
+            background-color: #007bff;
             color: white;
-            padding: 10px;
             border: none;
+            padding: 10px;
             font-size: 16px;
             cursor: pointer;
         }
         input[type="submit"]:hover {
-            background-color: #218838;
+            background-color: #0056b3;
         }
         .result {
             margin-top: 20px;
+            padding: 10px;
             font-weight: bold;
+            color: green;
             text-align: center;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
         }
     </style>
 </head>
 <body>
-    <h2>ATM Machine</h2>
-    <form method="post">
-        <label for="pin">Enter your PIN:</label>
-        <input type="password" id="pin" name="pin" required>
 
-        <label for="choice">Select Action:</label>
-        <select id="choice" name="choice">
-            <option value="1">Deposit</option>
-            <option value="2">Withdraw</option>
-            <option value="3">Check Balance</option>
-            <option value="4">Exit</option>
-        </select>
+<h2>ATM Machine</h2>
+<form method="post">
+    <label for="pin">Enter your PIN:</label>
+    <input type="password" id="pin" name="pin" required>
 
-        <label for="amount">Enter Amount (if applicable):</label>
-        <input type="number" id="amount" name="amount" step="0.01" min="0">
+    <label for="choice">Select Action:</label>
+    <select id="choice" name="choice" required>
+        <option value="1">Deposit</option>
+        <option value="2">Withdraw</option>
+        <option value="3">Check Balance</option>
+        <option value="4">Exit</option>
+    </select>
 
-        <input type="submit" value="Submit">
-    </form>
+    <label for="amount">Enter Amount (if applicable):</label>
+    <input type="number" id="amount" name="amount" step="0.01" min="0">
 
-    <div class="result">
-        <%= result %>
-    </div>
+    <input type="submit" value="Submit">
+</form>
+
+<% if (!result.isEmpty()) { %>
+    <div class="result"><%= result %></div>
+<% } %>
+
 </body>
 </html>
